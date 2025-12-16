@@ -27,13 +27,13 @@ jobs:
         run: |
           pip install pandas requests tldextract scikit-learn numpy
       
-      - name: Debug - List files
+      - name: List directory structure
         run: |
-          echo "Current directory: $(pwd)"
-          echo "Files in directory:"
+          echo "Repository root contents:"
           ls -la
-          echo "Checking for virustotal files:"
-          ls -la virustotal* || echo "No virustotal files found"
+          echo ""
+          echo "Looking for virustotal files..."
+          find . -name "virustotal*.txt" -type f
       
       - name: Update API key from secret
         run: |
