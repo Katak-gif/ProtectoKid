@@ -1,15 +1,78 @@
 /***** ------------------- ML PREDICTION (Random Forest - Trained on VirusTotal Data) ------------------- *****/
 var testdata;
 var prediction;
+var threatDatabase = null; // Cache for cloud-hosted threat database
+
+// Fetch threat database from cloud (GitHub Pages or your server)
+async function loadThreatDatabase() {
+  try {
+    // Replace this URL with your hosted threat-database.json URL
+    // For GitHub Pages: https://yourusername.github.io/repo-name/threat-database.json
+    const url = 'https://raw.githubusercontent.com/Katak-gif/ProtectoKid/main/threat-database.json';
+    
+    const response = await fetch(url, { 
+      cache: 'no-cache', // Always get latest version
+      headers: { 'Accept': 'application/json' }
+    });
+    
+    if (response.ok) {
+      threatDatabase = await response.json();
+      console.log('[ProtectoKid] Threat database loaded:', threatDatabase.version, '| Updated:', threatDatabase.lastUpdated);
+    } else {
+      console.warn('[ProtectoKid] Failed to load threat database, using fallback');
+    }
+  } catch (error) {
+    console.warn('[ProtectoKid] Error loading threat database:', error.message);
+  }
+}
+
+// Check URL against threat database
+function checkThreatDatabase(hostname) {
+  if (!threatDatabase) return null; // Database not loaded yet
+  
+  // Check blacklist (instant malicious detection)
+  if (threatDatabase.blacklist) {
+    for (let domain of threatDatabase.blacklist) {
+      if (hostname === domain || hostname.endsWith('.' + domain)) {
+        return 1; // Malicious
+      }
+    }
+  }
+  
+  // Check suspicious domains
+  if (threatDatabase.suspiciousDomains) {
+    for (let domain of threatDatabase.suspiciousDomains) {
+      if (hostname === domain || hostname.endsWith('.' + domain)) {
+        return 0; // Suspicious
+      }
+    }
+  }
+  
+  // Check whitelist (instant safe detection)
+  if (threatDatabase.whitelist) {
+    for (let domain of threatDatabase.whitelist) {
+      if (hostname === domain || hostname.endsWith('.' + domain)) {
+        return -1; // Safe
+      }
+    }
+  }
+  
+  return null; // Not found in database, proceed with ML
+}
 
 function predict(data, weight){
-  // Whitelist for known safe domains (prevents false positives on legitimate sites)
   const hostname = window.location.hostname.toLowerCase().replace('www.', '');
-  const safeDomains = [
-    'google.com'
-  ];
   
-  for (let domain of safeDomains) {
+  // 1. Check cloud-hosted threat database first (if loaded)
+  const dbResult = checkThreatDatabase(hostname);
+  if (dbResult !== null) {
+    console.log('[ProtectoKid] Match found in threat database:', dbResult === 1 ? 'Malicious' : dbResult === 0 ? 'Suspicious' : 'Safe');
+    return dbResult;
+  }
+  
+  // 2. Fallback whitelist (in case database fails to load)
+  const fallbackSafeDomains = ['google.com', 'youtube.com', 'facebook.com', 'microsoft.com'];
+  for (let domain of fallbackSafeDomains) {
     if (hostname === domain || hostname.endsWith('.' + domain)) {
       return -1; // Safe - whitelisted domain
     }
@@ -21,7 +84,7 @@ function predict(data, weight){
   weight = [7.80591451e-02, 2.30999859e-03, 2.43416917e-02, 5.60592314e-03, 2.08000827e-02, 1.00765788e-01, 1.97684453e-04, 5.18847074e-03, 1.11906348e-03, 1.77194355e-02, 6.94259966e-02, 3.36121563e-09, 8.10997254e-03, 1.07759619e-03, 2.08821802e-02, 2.20703977e-04, 4.52107832e-01, 8.90150883e-02, 2.00343795e-03, 0.00000000e+00, 0.00000000e+00, 1.01049906e-01];
   
   // Calculate weighted score based on feature importance
-  var f = 0, maybeCount = 0, suspiciousScore = 0, maliciousScore = 0, safeScore = 0;
+  var maybeCount = 0, suspiciousScore = 0, maliciousScore = 0, safeScore = 0;
   
   for (var j = 0; j < data.length; j++) {
     var featureValue = data[j];
@@ -38,11 +101,9 @@ function predict(data, weight){
       }
       else if (featureValue === 1) {
         maliciousScore += featureWeight;
-        f += featureWeight;
       }
       else if (featureValue === -1) {
         safeScore += featureWeight;
-        f -= featureWeight * 0.3;
       }
     }
     // Handle continuous features (indices 16-21: raw numeric values)
@@ -217,17 +278,22 @@ function performAnalysis() {
   return { testdata, prediction };
 }
 
-// Execute when DOM is interactive or complete
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    const result = performAnalysis();
-    testdata = result.testdata;
-    prediction = result.prediction;
-  });
-} else {
+// Initialize: Load threat database, then perform analysis
+async function initialize() {
+  await loadThreatDatabase(); // Load cloud-hosted blacklist/whitelist
+  
   const result = performAnalysis();
   testdata = result.testdata;
   prediction = result.prediction;
+}
+
+// Execute when DOM is interactive or complete
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initialize();
+  });
+} else {
+  initialize();
 }
 
 /***** ------------------- UI: MATCH YOUR MOCK ------------------- *****/
@@ -320,13 +386,12 @@ function buildModal(payload){
                            'This website is safe';
 
   const themeClass = state==='malicious'?'pk-malicious':state==='suspicious'?'pk-suspicious':'pk-safe';
-  const mark = state==='malicious'?'✖':state==='suspicious'?'!':'✓';
 
   // Select hero image based on state
   const heroImageName =
-    state==='malicious'  ? 'mal.png' :
-    state==='suspicious' ? 'sus.png' :
-                           'safe.png';
+    state==='malicious'  ? 'icons/mal.png' :
+    state==='suspicious' ? 'icons/sus.png' :
+                           'icons/safe.png';
 
   const overlay = document.createElement("div");
   overlay.id = "pk-overlay";
@@ -398,27 +463,23 @@ function buildModal(payload){
   setTimeout(()=>ok.focus(), 0);
 }
 
-/***** ------------------- MESSAGE ROUNDTRIP + SHOW MODAL ------------------- *****/
-function showSecurityModal() {
-  // Log prediction results for debugging
-  console.log('[ProtectoKid] Prediction value:', prediction);
-  console.log('[ProtectoKid] Feature data:', testdata);
-
-  // Always show modal for all predictions: safe (-1), suspicious (0), malicious (1)
-  chrome.runtime.sendMessage({ type: "prediction", prediction: prediction }, function(response) {
-    let status;
-    
-    if (chrome.runtime.lastError) {
-      // If SW is inactive, still show based on local prediction
-      console.log('[ProtectoKid] Service worker error, using local prediction');
-      status = prediction === 1 ? 'malicious' : prediction === 0 ? 'suspicious' : 'safe';
-    } else {
-      status = response?.status || (prediction === 1 ? 'malicious' : prediction === 0 ? 'suspicious' : 'safe');
-    }
-    
-    console.log('[ProtectoKid] Showing modal with status:', status);
-    buildModal({ status });
-  });
+/***** ------------------- SHOW MODAL ------------------- *****/
+async function showSecurityModal() {
+  // Wait for prediction to be available
+  let attempts = 0;
+  while (prediction === undefined && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  
+  // Convert prediction to status
+  const status = prediction === 1 ? 'malicious' : prediction === 0 ? 'suspicious' : 'safe';
+  
+  console.log('[ProtectoKid] Prediction:', prediction, '| Status:', status);
+  if (threatDatabase) {
+    console.log('[ProtectoKid] Using threat database version:', threatDatabase.version);
+  }
+  buildModal({ status });
 }
 
 // Show modal after a short delay to ensure everything is loaded

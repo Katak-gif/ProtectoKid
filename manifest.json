@@ -3,9 +3,9 @@
   "name": "ProtectoKid(new)",
   "version": "0.2",
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
   "background": { "service_worker": "background.js" },
   "content_scripts": [
@@ -17,7 +17,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["icon128.png", "safe.png", "sus.png", "mal.png"],
+      "resources": ["icons/icon128.png", "icons/safe.png", "icons/sus.png", "icons/mal.png"],
       "matches": ["<all_urls>"]
     }
   ],

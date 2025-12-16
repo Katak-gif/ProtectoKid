@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-17T00:00:00Z",
+  "whitelist": [
+    "google.com",
+    "youtube.com",
+    "facebook.com",
+    "microsoft.com",
+    "amazon.com",
+    "wikipedia.org",
+    "github.com",
+    "twitter.com",
+    "linkedin.com",
+    "reddit.com"
+  ],
+  "blacklist": [
+    "example-phishing-site.tk",
+    "malicious-url.ml",
+    "fake-bank-login.ga"
+  ],
+  "suspiciousDomains": [
+    "example-suspicious.xyz",
+    "questionable-site.top"
+  ],
+  "suspiciousTLDs": [
+    "tk", "ml", "ga", "cf", "gq", "xyz", "top", "work", 
+    "click", "link", "party", "trade", "webcam"
+  ]
+}
