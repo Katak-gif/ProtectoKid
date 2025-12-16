@@ -27,6 +27,14 @@ jobs:
         run: |
           pip install pandas requests tldextract scikit-learn numpy
       
+      - name: Debug - List files
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Files in directory:"
+          ls -la
+          echo "Checking for virustotal files:"
+          ls -la virustotal* || echo "No virustotal files found"
+      
       - name: Update API key from secret
         run: |
           sed -i "s/VIRUSTOTAL_API_KEY = .*/VIRUSTOTAL_API_KEY = \"${{ secrets.VIRUSTOTAL_API_KEY }}\"/" train_with_virustotal_api.py
