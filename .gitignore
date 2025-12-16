@@ -17,9 +17,9 @@ website_dataset.csv
 website_dataset_enhanced.csv
 website_dataset_virustotal.csv
 
-# Large text files
-virustotalresult_malicious.txt
-virustotalresult_suspicious.txt
+# Large text files - COMMENTED OUT SO GITHUB ACTIONS CAN USE THEM
+# virustotalresult_malicious.txt
+# virustotalresult_suspicious.txt
 
 # Model files (generated)
 random_forest_model.pkl
