@@ -1,0 +1,110 @@
+{
+  "model_type": "RandomForest_Optimized",
+  "accuracy": 0.62,
+  "feature_importance": [
+    {
+      "feature": "isTinyURL",
+      "importance": 0.46222697645127214
+    },
+    {
+      "feature": "extremeLength",
+      "importance": 0.19492033270070613
+    },
+    {
+      "feature": "isMultiDomainURL",
+      "importance": 0.09622403758003423
+    },
+    {
+      "feature": "suspiciousDomain",
+      "importance": 0.05399805082211024
+    },
+    {
+      "feature": "isFaviconDomainUnidentical",
+      "importance": 0.0356543451104266
+    },
+    {
+      "feature": "isHypenURL",
+      "importance": 0.0317746165110252
+    },
+    {
+      "feature": "isFormActionInvalid",
+      "importance": 0.022654983201827773
+    },
+    {
+      "feature": "phishingIndicators",
+      "importance": 0.02212963517489424
+    },
+    {
+      "feature": "isImgFromDifferentDomain",
+      "importance": 0.019575268867681805
+    },
+    {
+      "feature": "isAnchorFromDifferentDomain",
+      "importance": 0.01777962447440077
+    },
+    {
+      "feature": "isLongURL",
+      "importance": 0.01714410839070991
+    },
+    {
+      "feature": "externalResources",
+      "importance": 0.013525468266205182
+    },
+    {
+      "feature": "isScLnkFromDifferentDomain",
+      "importance": 0.012392552448705806
+    },
+    {
+      "feature": "isRedirectingURL",
+      "importance": 0.0
+    },
+    {
+      "feature": "isAlphaNumericURL",
+      "importance": 0.0
+    },
+    {
+      "feature": "isIPInURL",
+      "importance": 0.0
+    },
+    {
+      "feature": "isIllegalHttpsURL",
+      "importance": 0.0
+    },
+    {
+      "feature": "isIframePresent",
+      "importance": 0.0
+    },
+    {
+      "feature": "isStatusBarTampered",
+      "importance": 0.0
+    },
+    {
+      "feature": "isMailToAvailable",
+      "importance": 0.0
+    },
+    {
+      "feature": "urlStructureIssues",
+      "importance": 0.0
+    }
+  ],
+  "weights_for_js": [
+    0.46222697645127214,
+    0.19492033270070613,
+    0.09622403758003423,
+    0.05399805082211024,
+    0.0356543451104266,
+    0.0317746165110252,
+    0.022654983201827773,
+    0.02212963517489424,
+    0.019575268867681805,
+    0.01777962447440077,
+    0.01714410839070991,
+    0.013525468266205182,
+    0.012392552448705806,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "training_date": "2025-12-15",
+  "samples_trained": 1500
+}

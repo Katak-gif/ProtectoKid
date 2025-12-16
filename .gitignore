@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.pkl
+
+# VS Code
+.vscode/
+
+# Dataset files (too large for GitHub)
+website_dataset.csv
+website_dataset_enhanced.csv
+website_dataset_virustotal.csv
+
+# Large text files
+virustotalresult_malicious.txt
+virustotalresult_suspicious.txt
+
+# Model files (generated)
+random_forest_model.pkl
+random_forest_model_optimized.pkl
+
+# OS
+.DS_Store
+Thumbs.db
